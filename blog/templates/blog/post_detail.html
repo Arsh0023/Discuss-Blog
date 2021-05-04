@@ -1,0 +1,42 @@
+{% extends "blog/base.html" %}
+{% block content%}
+    <div class="post_title"> {{post.title}}</div>
+    {% if post.published_date %}
+        <div class="date postdate">
+            {{post.published_date}}
+            <p class='post_data'>Posted by:- {{post.author}} </p>
+        </div>
+    {% else %}
+        <a class="btn btn-primary" href="{% url 'blog:post_publish' pk=post.pk%}">Publish</a>
+        <br> <br>
+    {% endif %}
+    <p class='postcontent' style="background-color:white; border: 1px solid black; padding:10px; border-radius: 15px;" >{{ post.text|safe|linebreaksbr }}</p>
+
+    {% if user.is_authenticated %}
+        <!-- then we need to show publish drafts edit and remove etc options there. -->
+        <a name="" id="" class="btn btn-primary" href="{% url 'blog:post_update' pk=post.pk %}" role="button"> <i class="bi bi-pencil">Edit</i> </a>
+        <a name="" id="" class="btn btn-primary" href="{% url 'blog:post_delete' pk=post.pk %}" role="button"> <i class="bi bi-file-earmark-minus">Remove</i> </a>
+    {% endif %}
+
+    <hr>
+    <a name="" id="" class="btn btn-primary" href="{% url 'blog:add_comment_to_post' pk=post.pk %}" role="button"><i class="bi bi-journal-plus">Add Comment</i></a>
+    
+    <div>
+        {% for comment in post.comments.all  %}
+          {% if user.is_authenticated or comment.approved_comment %}
+            {{comment.create_date}}
+            {% if not comment.approved_comment %}
+                <a name="" id="" class="btn btn-default" href="{% url 'blog:comment_remove' pk=comment.pk %}" role="button"> <i
+                class="bi bi-file-earmark-minus">Remove Comment</i> </a>
+                <a name="" id="" class="btn btn-default" href="{% url 'blog:comment_approve' pk=comment.pk %}" role="button"> <i
+                class="bi bi-bookmark-check">Approve Comment</i></a>
+
+            {% endif %}
+                <p class = "comment_box" style="background-color:white; border: 1px solid black; padding:10px; border-radius: 15px;"> {{comment.text|safe|linebreaks}} </p>
+                <p>Posted by: {{comment.author}} </p>
+          {% endif %}
+          {% empty %}
+            <p>No Comments</p>
+        {% endfor %}
+    </div>
+{% endblock %}
